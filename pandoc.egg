@@ -1,0 +1,19 @@
+;;; -*- Scheme -*-
+
+;;; This file is used by the CHICKEN 5 extension manager
+;;; (chicken-install)
+
+((synopsis "Call upon Pandoc to parse documents into SXML")
+ (category parsing)
+ (license "MIT")
+ (author "Lassi Kortela")
+ (maintainer "Lassi Kortela")
+ (dependencies medea)
+ (test-dependencies)
+ (distribution-files
+  "pandoc.egg"
+  "pandoc.release-info"
+  "pandoc.chicken.scm"
+  "pandoc.r5rs.scm")
+ (components
+  (extension pandoc (source "pandoc.chicken.scm"))))

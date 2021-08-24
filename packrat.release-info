@@ -1,0 +1,8 @@
+;;; -*- Scheme -*-
+
+;;; This file is used by the CHICKEN 5 extension which caches eggs in
+;;; egg servers (henrietta-cache)
+
+(uri
+ egg-file
+ "https://raw.githubusercontent.com/lassik/scheme-pandoc/master/pandoc.egg")
