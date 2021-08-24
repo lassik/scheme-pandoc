@@ -1,0 +1,12 @@
+(import (scheme base) (scheme write))
+(import (rename (only (gauche base) pprint) (pprint pretty-print))
+        (rename (only (sxml serializer) srl:sxml->html) (srl:sxml->html sxml->html))
+        (pandoc))
+
+(display (sxml->html (pandoc-file->sxml 'gfm "test/CharEq.md")))
+(newline)
+(newline)
+(display (sxml->html (pandoc-file->sxml 'gfm "test/VoidValue.md")))
+(newline)
+(newline)
+(pretty-print (pandoc-file->json 'gfm "test/VoidValue.md"))
