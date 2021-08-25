@@ -3,6 +3,6 @@
 ;;; This file is used by the CHICKEN 5 extension which caches eggs in
 ;;; egg servers (henrietta-cache)
 
-(uri
- egg-file
- "https://raw.githubusercontent.com/lassik/scheme-pandoc/master/pandoc.egg")
+(repo git "git://github.com/lassik/scheme-{egg-name}.git")
+(uri targz "https://github.com/lassik/scheme-{egg-name}/tarball/{egg-release}")
+(release "0.1")
