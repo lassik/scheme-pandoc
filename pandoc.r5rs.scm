@@ -43,9 +43,9 @@
             ((equal? type "Code")
              `(code ,@(convert-many (cdr (contents-list)))))
             ((equal? type "CodeBlock")
-             `(pre (@ (data-syntax ,(join-adjacent-strings
-                                     (vector->list
-                                      (vector-refs (contents) 0 1)))))
+             `(pre (@ (data-syntax ,@(join-adjacent-strings
+                                      (vector->list
+                                       (vector-refs (contents) 0 1)))))
                    ,@(convert-many (cdr (contents-list)))))
             ((equal? type "Emph")
              `(em ,@(convert-many (cdr (contents-list)))))
