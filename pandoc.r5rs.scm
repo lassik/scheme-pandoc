@@ -90,6 +90,14 @@
 
   (define (convert-many elements)
     (join-adjacent-strings (map convert-block-or-inline elements)))
+
+  (define (assert-supported-version)
+    (let* ((version (cdr (assq 'pandoc-api-version json)))
+           (major (vector-ref version 0)))
+      (unless (= major 1)
+        (error "Pandoc API version is not 1.x" version))))
+
+  (assert-supported-version)
   (convert-many (vector->list (cdr (assq 'blocks json)))))
 
 (define (pandoc-port->json input-format input-port)
