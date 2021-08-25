@@ -1,0 +1,83 @@
+[[tags: egg]]
+
+== pandoc
+
+[[toc:]]
+
+=== Introduction
+
+This egg provides a Scheme interface to
+[[https://pandoc.org/|Pandoc]], the universal document converter.
+
+Pandoc can convert documents between several markup languages
+(Markdown, AsciiDoc, etc.) It fits all of those languages into a
+uniform syntax tree. This egg supplies JSON and SXML versions of the
+syntax tree.
+
+=== Documentation
+
+<parameter>(pandoc-command-line [string-list])</parameter>
+
+This parameter lets the user customize the command line that is given
+to the operating system to run Pandoc. All Pandoc invocations start
+with this command line. The default is {{'("pandoc")}}.
+
+Treat this parameter like RnRS {{command-line}}: shell syntax cannot
+be used, and command line arguments should not be shell-quoted.
+
+<procedure>(pandoc-port->json input-format input-port)</procedure>
+<procedure>(pandoc-file->json input-format input-filename)</procedure>
+
+These procedures return Pandoc's JSON parse tree. The JSON is decoded
+into the canonical Scheme JSON representation used by SRFI 180, the
+{{cjson}} and {{medea}} eggs, etc.: JSON arrays become Scheme vectors,
+JSON objects become Scheme association lists with symbol keys, and
+JSON null becomes the symbol {{'null}}.
+
+The {{input-format}} argument is a symbol, and is supplied as Pandoc's
+{{--from}} argument.
+
+An exception is raised if the conversion is not successful.
+
+<procedure>(pandoc-port->sxml input-format input-port)</procedure>
+<procedure>(pandoc-file->sxml input-format input-filename)</procedure>
+
+These procedures are like their {{->json}} counterparts, but instead
+of JSON they return an SXML conversion of Pandoc's parse tree using
+HTML tags. The parse tree is easy to turn into HTML using one of
+several Scheme libraries, e.g. Chicken's {{sxml-transforms}} egg.
+
+=== Caveats
+
+Pandoc can be quite slow, but its work could be easily parallelized by
+running one instance of Pandoc per document.
+
+=== Version History
+
+* 0.1: First release
+
+=== Author
+
+Lassi Kortela
+
+=== Repository
+
+[[https://github.com/lassik/scheme-pandoc|
+https://github.com/lassik/scheme-pandoc]]
+
+=== License
+
+  Copyright 2020 Lassi Kortela
+
+  Permission to use, copy, modify, and distribute this software for any
+  purpose with or without fee is hereby granted, provided that the above
+  copyright notice and this permission notice appear in all copies.
+
+  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+  WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+  WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+  AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+  DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+  PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+  PERFORMANCE OF THIS SOFTWARE.
