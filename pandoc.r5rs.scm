@@ -10,6 +10,9 @@
                   (cons (car list) new-list))
               (cdr list)))))
 
+(define (join-adjacent-strings list)
+  (join-adjacent string? string-append list))
+
 (define (vector-refs vec . indexes)
   (let loop ((obj vec) (indexes indexes))
     (if (null? indexes) obj
@@ -17,8 +20,10 @@
               (cdr indexes)))))
 
 (define (pandoc-json->sxml json)
+
   (define (convert-block-or-inline element)
     (if (string? element) element (convert-block element)))
+
   (define (convert-block block)
     (let ((type (cdr (assq 't block))))
       (define (contents) (cdr (assq 'c block)))
@@ -27,20 +32,41 @@
              " ")
             ((equal? type "Str")
              (contents))
+            ((equal? type "BulletList")
+             `(ul
+               ,@(map (lambda (list-element)
+                        `(li ,@(convert-many (vector->list list-element))))
+                      (contents-list))))
+            ((equal? type "BlockQuote")
+             `(blockquote
+               ,@(convert-many (contents-list))))
             ((equal? type "Code")
              `(code ,@(convert-many (cdr (contents-list)))))
+            ((equal? type "CodeBlock")
+             `(pre (@ (data-syntax ,(join-adjacent-strings
+                                     (vector->list
+                                      (vector-refs (contents) 0 1)))))
+                   ,@(convert-many (cdr (contents-list)))))
+            ((equal? type "Emph")
+             `(em ,@(convert-many (cdr (contents-list)))))
             ((equal? type "Header")
              (let* ((level (car (contents-list)))
                     (h-tag (string->symbol
                             (string-append "h" (number->string level)))))
                `(,h-tag ,@(convert-many (vector->list
                                          (list-ref (contents-list) 2))))))
+            ((equal? type "Link")
+             `(a (@ (href ,(join-adjacent-strings
+                            (vector->list (vector-ref (contents) 2)))))
+                 ,@(convert-many (vector->list (vector-ref (contents) 1)))))
             ((equal? type "Plain")
              `(span ,@(convert-many (contents-list))))
             ((equal? type "Para")
              `(p ,@(convert-many (contents-list))))
             ((equal? type "SoftBreak")
              "\n")
+            ((equal? type "Strong")
+             `(strong ,@(convert-many (contents-list))))
             ((equal? type "Table")
              (let ((headings (vector-refs (contents) 3 1 0 1)))
                `(table
@@ -60,10 +86,10 @@
                                       (vector->list (vector-refs row 1)))))
                         (vector->list (vector-refs (contents) 4 0 3))))))
             (else
-             (error "Unknown type" type)))))
+             (error "Unknown type in pandoc JSON" type)))))
+
   (define (convert-many elements)
-    (join-adjacent string? string-append
-                   (map convert-block-or-inline elements)))
+    (join-adjacent-strings (map convert-block-or-inline elements)))
   (convert-many (vector->list (cdr (assq 'blocks json)))))
 
 (define (pandoc-port->json input-format input-port)
