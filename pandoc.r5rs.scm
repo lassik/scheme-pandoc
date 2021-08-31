@@ -48,7 +48,7 @@
                                        (vector-refs (contents) 0 1)))))
                    ,@(convert-many (cdr (contents-list)))))
             ((equal? type "Emph")
-             `(em ,@(convert-many (cdr (contents-list)))))
+             `(em ,@(convert-many (contents-list))))
             ((equal? type "Header")
              (let* ((level (car (contents-list)))
                     (h-tag (string->symbol
