@@ -11,10 +11,10 @@
           (only (chicken io) read-byte write-byte)
           (only (chicken port) copy-port)
           (only (chicken process) process process-wait)
-          (rename (only (medea) read-json)
-                  (read-json json-read)))
+          (only (scsh-process) run/port)
+          (only (medea) read-json))
 
-  (define (run-read-write args input-port read-output)
+  (define (run-read-write/old args input-port read-output)
     (receive (from-sub to-sub sub) (process (car args) (cdr args))
       (copy-port input-port to-sub read-byte write-byte)
       (close-output-port to-sub)
@@ -27,6 +27,11 @@
           (close-input-port from-sub)
           (if (and clean-exit? (eqv? 0 exit-status)) output
               (error "Error running" args))))))
+
+  (define (pandoc-port->json input-format input-port)
+    (let ((pandoc (string->symbol (car (pandoc-command-line)))))
+      (read-json (run/port (,pandoc --from ,input-format --to json)
+                           (= 0 input-port)))))
 
   (define (call-with-binary-input-file filename proc)
     (let ((port (open-input-file filename #:binary)))

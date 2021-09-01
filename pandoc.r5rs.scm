@@ -100,13 +100,6 @@
   (assert-supported-version)
   (convert-many (vector->list (cdr (assq 'blocks json)))))
 
-(define (pandoc-port->json input-format input-port)
-  (run-read-write (append (pandoc-command-line)
-                          (list "--from" (symbol->string input-format)
-                                "--to" "json"))
-                  input-port
-                  json-read))
-
 (define (pandoc-port->sxml input-format input-port)
   (pandoc-json->sxml (pandoc-port->json input-format input-port)))
 
