@@ -4,7 +4,8 @@
    pandoc-port->json
    pandoc-port->sxml
    pandoc-file->json
-   pandoc-file->sxml)
+   pandoc-file->sxml
+   pandoc-json->sxml)
 
   (import (scheme)
           (chicken base)
