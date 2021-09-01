@@ -8,6 +8,7 @@
 
   (import (scheme)
           (chicken base)
+          (cjson)
           (only (chicken port) with-input-from-string)
           (only (chicken io) read-string)
           (only (http-client) with-input-from-request)
@@ -37,9 +38,17 @@
                         (cons 'text input-string)))
                 input-strings)))))
      (lambda ()
-       (map (lambda (string)
-              (with-input-from-string string read-json))
-            (vector->list (read-json))))))
+       (let ((array (string->cjson (read-string))))
+         (unless (eq? cjson/array (cjson-type array))
+           (error "Got unexpected JSON from pandoc-server"))
+         (let loop ((i (- (cjson-array-size array) 1)) (results '()))
+           (if (< i 0) results
+               (loop (- i 1)
+                     (cons (cjson-schemify
+                            (string->cjson
+                             (cjson-schemify
+                              (cjson-array-ref array i))))
+                           results))))))))
 
   (define (pandoc-server-files->json input-format input-filenames)
     (pandoc-server-strings->json

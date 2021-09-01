@@ -8,7 +8,7 @@
  (license "MIT")
  (author "Lassi Kortela")
  (maintainer "Lassi Kortela")
- (dependencies http-client medea scsh-process)
+ (dependencies cjson http-client medea scsh-process)
  (test-dependencies)
  (distribution-files
   "pandoc.server.chicken.scm"
