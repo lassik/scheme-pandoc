@@ -5,7 +5,7 @@
    pandoc-server-strings->sxml
    pandoc-server-files->json
    pandoc-server-files->sxml)
-  
+
   (import (scheme)
           (chicken base)
           (only (chicken port) with-input-from-string)
@@ -46,7 +46,7 @@
      input-format
      (map (lambda (filename) (with-input-from-file filename read-string))
           input-filenames)))
-  
+
   (define (pandoc-server-strings->sxml input-format input-strings)
     (map pandoc-json->sxml
          (pandoc-server-strings->json input-format input-strings)))
