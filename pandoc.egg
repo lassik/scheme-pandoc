@@ -11,14 +11,18 @@
  (dependencies cjson http-client medea scsh-process)
  (test-dependencies)
  (distribution-files
-  "pandoc.server.chicken.scm"
-  "pandoc.chicken.scm"
-  "pandoc.egg"
   "pandoc.r5rs.scm"
+  "pandoc.chicken.scm"
+  "pandoc.server.chicken.scm"
+  "pandoc.tar.chicken.scm"
+  "pandoc.egg"
   "pandoc.release-info")
  (components
   (extension pandoc
              (source "pandoc.chicken.scm"))
   (extension pandoc.server
              (source "pandoc.server.chicken.scm")
+             (component-dependencies pandoc))
+  (extension pandoc.tar
+             (source "pandoc.tar.chicken.scm")
              (component-dependencies pandoc))))
