@@ -52,7 +52,8 @@
             ((equal? type "Header")
              (let* ((level (car (contents-list)))
                     (h-tag (string->symbol
-                            (string-append "h" (number->string level)))))
+                            (string-append
+                             "h" (number->string (inexact->exact level))))))
                `(,h-tag ,@(convert-many (vector->list
                                          (list-ref (contents-list) 2))))))
             ((equal? type "Link")
