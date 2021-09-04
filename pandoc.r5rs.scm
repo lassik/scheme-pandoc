@@ -63,6 +63,21 @@
              `(span ,@(convert-many (contents-list))))
             ((equal? type "Para")
              `(p ,@(convert-many (contents-list))))
+            ((equal? type "Quoted") ; TODO: What's this?
+             `(blockquote
+               ,@(convert-many '())))
+            ((equal? type "SingleQuote") ; TODO: What's this?
+             `(blockquote
+               ,@(convert-many '())))
+            ((equal? type "DoubleQuote") ; TODO: What's this?
+             `(blockquote
+               ,@(convert-many '())))
+            ((equal? type "OrderedList") ; TODO: What's this?
+             `(blockquote
+               ,@(convert-many '())))
+            ((equal? type "Superscript") ; TODO: What's this?
+             `(blockquote
+               ,@(convert-many '())))
             ((equal? type "SoftBreak")
              "\n")
             ((equal? type "Strong")
