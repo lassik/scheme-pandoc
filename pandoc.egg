@@ -20,6 +20,9 @@
  (components
   (extension pandoc
              (source "pandoc.chicken.scm"))
+  (extension pandoc.cli
+             (source "pandoc.cli.chicken.scm")
+             (component-dependencies pandoc))
   (extension pandoc.server
              (source "pandoc.server.chicken.scm")
              (component-dependencies pandoc))

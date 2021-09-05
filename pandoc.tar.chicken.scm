@@ -1,43 +1,34 @@
 (module (pandoc tar)
 
-  (pandoc-tar-command
-   pandoc-tar-strings->json
-   pandoc-tar-strings->sxml
-   pandoc-tar-files->json
-   pandoc-tar-files->sxml)
+  (#;export
+   pandoc-tar)
 
   (import (scheme)
           (chicken base)
           (cjson)
-          (srfi 4)
-          (scheme base)
+          ;;(srfi 4)
+          (only (scheme base)
+                bytevector
+                bytevector-append
+                bytevector-length
+                bytevector-u8-ref
+                eof-object
+                make-bytevector
+                read-bytevector
+                string->utf8
+                truncate-remainder
+                utf8->string
+                write-bytevector)
           (only (chicken io) read-byte read-string write-byte write-string)
           (only (chicken port)
                 copy-port with-input-from-string with-output-to-string)
-          (only (chicken process) process process-wait)
           (only (scsh-process) run/port run/string)
           (only (pandoc) pandoc-json->sxml))
-
-  ;;  (define (eof-object) #!eof)
-  ;;  (define (string->utf8 str) str)
-  ;;  (define (utf8->string str) str)
-  ;;  (define bytevector string)
-  ;;  (define (bytevector-append bvs)
-  ;;    (let ((target (make-u8vector
-  ;;  (define bytevector-length u8vector-length)
-  ;;  (define (bytevector-u8-ref s i) (char->integer (string-ref s i)))
-  ;;  (define make-bytevector make-u8vector)
-  ;;  (define read-bytevector read-string)
-  ;;  (define truncate-remainder remainder)
-  ;;  (define write-bytevector write-string)
 
   (define (generator->list generator)  ; SRFI 158
     (let loop ((list '()))
       (let ((elem (generator)))
         (if (eof-object? elem) (reverse list) (loop (cons elem list))))))
-
-  (define pandoc-tar-command
-    (make-parameter "pandoc-tar"))
 
   (define (bytevector-every? predicate bytes)
     (let loop ((i 0))
@@ -138,36 +129,16 @@
           (tar-write-file filename (car inputs))
           (loop (+ i 1) (cdr inputs))))))
 
-  (define (pandoc-tar-bytevectors->json input-format input-bytevectors)
-    (let* ((pandoc-tar
-            (string->symbol (pandoc-tar-command)))
-           (stdin
-            (with-output-to-string
-              (lambda ()
-                (write-all-to-tar input-bytevectors))))
-           (stdout
-            (run/string (,pandoc-tar --from ,input-format --to json)
-                        (<< ,stdin))))
-      (map (lambda (bytes)
-             (cjson-schemify (string->cjson (utf8->string bytes))))
-           (with-input-from-string stdout
-             (lambda () (generator->list tar-read-file))))))
-
-  (define (pandoc-tar-strings->json input-format input-strings)
-    (pandoc-tar-bytevectors->json
-     input-format
-     (map string->utf8 input-strings)))
-
-  (define (pandoc-tar-files->json input-format input-filenames)
-    (pandoc-tar-strings->json
-     input-format
-     (map (lambda (filename) (with-input-from-file filename read-string))
-          input-filenames)))
-
-  (define (pandoc-tar-strings->sxml input-format input-strings)
-    (map pandoc-json->sxml
-         (pandoc-tar-strings->json input-format input-strings)))
-
-  (define (pandoc-tar-files->sxml input-format input-filenames)
-    (map pandoc-json->sxml
-         (pandoc-tar-files->json input-format input-filenames))))
+  (define (pandoc-tar #!optional command-name)
+    (let ((command-name (string->symbol (or command-name "pandoc-tar"))))
+      (lambda (input-format bytevectors)
+        (let* ((stdin
+                (with-output-to-string
+                  (lambda () (write-all-to-tar bytevectors))))
+               (stdout
+                (run/string (,command-name --from ,input-format --to json)
+                            (<< ,stdin))))
+          (map (lambda (bytes)
+                 (cjson-schemify (string->cjson (utf8->string bytes))))
+               (with-input-from-string stdout
+                 (lambda () (generator->list tar-read-file)))))))))

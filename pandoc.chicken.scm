@@ -1,45 +1,53 @@
 (module pandoc
 
-  (pandoc-command-line
+  (#;export
+
+   pandoc-json->sxml
+
    pandoc-port->json
    pandoc-port->sxml
+
    pandoc-file->json
    pandoc-file->sxml
-   pandoc-json->sxml)
+
+   pandoc-files->json
+   pandoc-files->sxml
+
+   pandoc-bytevector->json
+   pandoc-bytevector->sxml
+
+   pandoc-bytevectors->json
+   pandoc-bytevectors->sxml
+
+   pandoc-string->json
+   pandoc-string->sxml
+
+   pandoc-strings->json
+   pandoc-strings->sxml)
 
   (import (scheme)
           (chicken base)
+          (only (scheme base)
+                bytevector
+                bytevector-append
+                read-bytevector
+                string->utf8)
           (only (chicken io) read-byte write-byte)
-          (only (chicken port) copy-port)
+          (only (chicken port) copy-port with-input-from-string)
           (only (chicken process) process process-wait)
           (only (scsh-process) run/port)
           (only (medea) read-json))
 
-  (define (run-read-write/old args input-port read-output)
-    (receive (from-sub to-sub sub) (process (car args) (cdr args))
-      (copy-port input-port to-sub read-byte write-byte)
-      (close-output-port to-sub)
-      (let ((output (read-output from-sub)))
-        (receive (sub clean-exit? exit-status) (process-wait sub)
-          ;; Call `process-wait` before closing the last port to avoid
-          ;; triggering the automatic `process-wait` done by `process`
-          ;; when all ports are closed. If we relied on the implicit
-          ;; `process-wait`, we couldn't find out the exit status.
-          (close-input-port from-sub)
-          (if (and clean-exit? (eqv? 0 exit-status)) output
-              (error "Error running" args))))))
-
-  (define (pandoc-port->json input-format input-port)
-    (let ((pandoc (string->symbol (car (pandoc-command-line)))))
-      (read-json (run/port (,pandoc --from ,input-format --to json)
-                           (= 0 input-port)))))
+  (define (read-bytevector-all port)
+    (let loop ((whole (bytevector)))
+      (let ((part (read-bytevector 1000 port)))
+        (if (eof-object? part) whole
+            (loop (bytevector-append whole part))))))
 
   (define (call-with-binary-input-file filename proc)
     (let ((port (open-input-file filename #:binary)))
       (dynamic-wind (lambda () #f)
                     (lambda () (proc port))
                     (lambda () (close-input-port port)))))
-
-  (define pandoc-command-line (make-parameter (list "pandoc")))
 
   (include "pandoc.r5rs.scm"))

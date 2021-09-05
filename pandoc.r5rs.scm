@@ -116,13 +116,63 @@
   (assert-supported-version)
   (convert-many (vector->list (cdr (assq 'blocks json)))))
 
-(define (pandoc-port->sxml input-format input-port)
-  (pandoc-json->sxml (pandoc-port->json input-format input-port)))
+;;
 
-(define (pandoc-file->json input-format input-filename)
-  (call-with-binary-input-file
-   input-filename
-   (lambda (input-port) (pandoc-port->json input-format input-port))))
+(define (pandoc-bytevectors->json pandoc input-format bytevectors)
+  (pandoc input-format bytevectors))
 
-(define (pandoc-file->sxml input-format input-filename)
-  (pandoc-json->sxml (pandoc-file->json input-format input-filename)))
+(define (pandoc-strings->json pandoc input-format strings)
+  (pandoc-bytevectors->json
+   pandoc input-format
+   (map string->utf8 strings)))
+
+(define (pandoc-files->json pandoc input-format filenames)
+  (pandoc-bytevectors->json
+   pandoc input-format
+   (map (lambda (filename)
+          (call-with-binary-input-file filename read-bytevector-all))
+        filenames)))
+
+;;
+
+(define (pandoc-bytevector->json pandoc input-format bytevector)
+  (car (pandoc-bytevectors->json pandoc input-format (list bytevector))))
+
+(define (pandoc-string->json pandoc input-format string)
+  (car (pandoc-strings->json pandoc input-format (list string))))
+
+(define (pandoc-file->json pandoc input-format filename)
+  (car (pandoc-files->json pandoc input-format (list filename))))
+
+;;
+
+(define (pandoc-bytevectors->sxml pandoc input-format bytevectors)
+  (map pandoc-json->sxml
+       (pandoc-bytevectors->json pandoc input-format bytevectors)))
+
+(define (pandoc-strings->sxml pandoc input-format strings)
+  (map pandoc-json->sxml
+       (pandoc-strings->json pandoc input-format strings)))
+
+(define (pandoc-files->sxml pandoc input-format filenames)
+  (map pandoc-json->sxml
+       (pandoc-files->json pandoc input-format filenames)))
+
+;;
+
+(define (pandoc-bytevector->sxml pandoc input-format bytevector)
+  (car (pandoc-bytevectors->sxml pandoc input-format (list bytevector))))
+
+(define (pandoc-string->sxml pandoc input-format string)
+  (car (pandoc-strings->sxml pandoc input-format (list string))))
+
+(define (pandoc-file->sxml pandoc input-format filename)
+  (car (pandoc-files->sxml pandoc input-format (list filename))))
+
+;;
+
+(define (pandoc-port->json pandoc input-format port)
+  (pandoc-bytevector->json pandoc input-format (read-bytevector-all port)))
+
+(define (pandoc-port->sxml pandoc input-format port)
+  (pandoc-bytevector->sxml pandoc input-format (read-bytevector-all port)))
