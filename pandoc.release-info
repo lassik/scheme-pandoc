@@ -7,3 +7,4 @@
 (uri targz "https://github.com/lassik/scheme-{egg-name}/tarball/{egg-release}")
 (release "0.1")
 (release "0.2")
+(release "0.2.1")
