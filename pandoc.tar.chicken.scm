@@ -130,7 +130,7 @@
           (loop (+ i 1) (cdr inputs))))))
 
   (define (pandoc-tar #!optional command-name)
-    (let ((command-name (string->symbol (or command-name "pandoc-tar"))))
+    (let ((command-name (or command-name "pandoc-tar")))
       (lambda (input-format bytevectors)
         (let* ((stdin
                 (with-output-to-string

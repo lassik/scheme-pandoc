@@ -10,7 +10,7 @@
           (only (scsh-process) run/port))
 
   (define (pandoc-cli #!optional command-name)
-    (let ((command-name (string->symbol (or command-name "pandoc"))))
+    (let ((command-name (or command-name "pandoc")))
       (lambda (input-format bytevectors)
         (map (lambda (bytevector)
                (read-json
