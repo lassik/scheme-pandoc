@@ -7,7 +7,6 @@
  (category parsing)
  (license "MIT")
  (author "Lassi Kortela")
- (maintainer "Lassi Kortela")
  (dependencies cjson http-client medea r7rs scsh-process)
  (test-dependencies)
  (distribution-files
