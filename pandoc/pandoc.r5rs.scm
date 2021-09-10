@@ -130,7 +130,8 @@
   (pandoc-bytevectors->json
    pandoc input-format
    (map (lambda (filename)
-          (call-with-binary-input-file filename read-bytevector-all))
+          (call-with-port (open-binary-input-file filename)
+                          read-bytevector-all))
         filenames)))
 
 ;;

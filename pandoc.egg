@@ -10,21 +10,53 @@
  (dependencies cjson http-client medea r7rs scsh-process)
  (test-dependencies)
  (distribution-files
-  "pandoc.r5rs.scm"
-  "pandoc.chicken.scm"
-  "pandoc.server.chicken.scm"
-  "pandoc.tar.chicken.scm"
+  "pandoc.sld"
+  "pandoc/cli.sld"
+  "pandoc/internal/json.sld"
+  "pandoc/internal/subprocess.sld"
+  "pandoc/server.sld"
+  "pandoc/tar.sld"
+
+  "pandoc/pandoc.r5rs.scm"
+  "pandoc/server.chicken.scm"
+  "pandoc/tar.r7rs.scm"
+
   "pandoc.egg"
   "pandoc.release-info")
  (components
+
   (extension pandoc
-             (source "pandoc.chicken.scm"))
+             (source "pandoc.sld")
+             (source-dependencies "pandoc/pandoc.r5rs.scm")
+             (csc-options "-R" "r7rs" "-X" "r7rs"))
+
   (extension pandoc.cli
-             (source "pandoc.cli.chicken.scm")
-             (component-dependencies pandoc))
+             (source "pandoc/cli.sld")
+             (component-dependencies
+              pandoc
+              pandoc.internal.json
+              pandoc.internal.subprocess)
+             (csc-options "-R" "r7rs" "-X" "r7rs"))
+
   (extension pandoc.server
-             (source "pandoc.server.chicken.scm")
-             (component-dependencies pandoc))
+             (source "pandoc/server.sld")
+             (source-dependencies "pandoc/server.chicken.scm")
+             (component-dependencies pandoc)
+             (csc-options "-R" "r7rs" "-X" "r7rs"))
+
   (extension pandoc.tar
-             (source "pandoc.tar.chicken.scm")
-             (component-dependencies pandoc))))
+             (source "pandoc/tar.sld")
+             (source-dependencies "pandoc/tar.r7rs.scm")
+             (component-dependencies
+              pandoc
+              pandoc.internal.json
+              pandoc.internal.subprocess)
+             (csc-options "-R" "r7rs" "-X" "r7rs"))
+
+  (extension pandoc.internal.json
+             (source "pandoc/internal/json.sld")
+             (csc-options "-R" "r7rs" "-X" "r7rs"))
+
+  (extension pandoc.internal.subprocess
+             (source "pandoc/internal/subprocess.sld")
+             (csc-options "-R" "r7rs" "-X" "r7rs"))))

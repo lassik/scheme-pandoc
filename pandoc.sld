@@ -26,20 +26,11 @@
   (import (scheme base)
           (scheme file)
           (scheme write))
-  (cond-expand
-    (gauche (import (only (srfi 180) json-read)
-                    (only (gauche base) copy-port)
-                    (only (gauche process) call-with-process-io))))
-  (cond-expand
-    (gauche (include "pandoc.gauche.scm")))
   (begin (define inexact->exact exact)
 
-         (define (call-with-binary-input-file filename proc)
-           (call-with-port (open-binary-input-file filename) proc))
-
-         (define (read-bytevector-all binary-input-port)
+         (define (read-bytevector-all port)
            (let loop ((whole (bytevector)))
-             (let ((part (read-bytevector 1000)))
+             (let ((part (read-bytevector 1000 port)))
                (if (eof-object? part) whole
                    (loop (bytevector-append whole part)))))))
-  (include "pandoc.r5rs.scm"))
+  (include "pandoc/pandoc.r5rs.scm"))
