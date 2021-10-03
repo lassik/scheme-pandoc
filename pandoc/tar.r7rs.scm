@@ -95,4 +95,7 @@
     (unless (null? inputs)
       (let ((filename (string-append (number->string i) ".md")))
         (tar-write-file filename (car inputs))
-        (loop (+ i 1) (cdr inputs))))))
+        (loop (+ i 1) (cdr inputs)))))
+  (let ((nulls (make-bytevector 512 0)))
+    (write-bytevector nulls)
+    (write-bytevector nulls)))
