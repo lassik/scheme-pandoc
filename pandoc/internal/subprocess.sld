@@ -7,7 +7,8 @@
      (begin
        (define (subprocess command-line stdin-bytevector read-stdout)
          (read-stdout (run/port (,(car command-line) ,@(cdr command-line))
-                                (<< ,(utf8->string stdin-bytevector)))))))
+                                (<< ,(utf8->string stdin-bytevector))
+                                (> 2 "/dev/null"))))))
     (gauche
      (import (only (gauche process) call-with-process-io))
      (begin
