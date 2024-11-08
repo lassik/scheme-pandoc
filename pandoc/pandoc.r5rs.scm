@@ -10,6 +10,13 @@
                   (cons (car list) new-list))
               (cdr list)))))
 
+(define (join-strings-into-one-string list)
+  (let loop ((result "") (tail list))
+    (cond ((null? tail) result)
+          ((string? (car tail)) (loop (string-append result (car tail))
+                                      (cdr tail)))
+          (else (error "Expected all strings" list)))))
+
 (define (vector-refs vec . indexes)
   (let loop ((obj vec) (indexes indexes))
     (if (null? indexes) obj
@@ -40,9 +47,9 @@
             ((equal? type "Code")
              `(code ,@(convert-many (cdr (contents-list)))))
             ((equal? type "CodeBlock")
-             `(pre (@ (data-syntax ,@(join-adjacent-strings
-                                      (vector->list
-                                       (vector-refs (contents) 0 1)))))
+             `(pre (@ (data-syntax ,(join-strings-into-one-string
+                                     (vector->list
+                                      (vector-refs (contents) 0 1)))))
                    ,@(convert-many (cdr (contents-list)))))
             ((equal? type "Emph")
              `(em ,@(convert-many (contents-list))))
@@ -62,7 +69,7 @@
                       ,(join-strings-into-one-string
                       (vector->list (vector-ref (contents) 1)))))))
             ((equal? type "Link")
-             `(a (@ (href ,(join-adjacent-strings
+             `(a (@ (href ,(join-strings-into-one-string
                             (vector->list (vector-ref (contents) 2)))))
                  ,@(convert-many (vector->list (vector-ref (contents) 1)))))
             ((equal? type "Plain")
