@@ -53,6 +53,14 @@
                              "h" (number->string (inexact->exact level))))))
                `(,h-tag ,@(convert-many (vector->list
                                          (list-ref (contents-list) 2))))))
+            ((equal? type "Image")
+             `(img (@ (src
+                       ,(join-strings-into-one-string
+                         (vector->list (vector-ref (contents) 2))))
+                      #;
+                      (alt
+                      ,(join-strings-into-one-string
+                      (vector->list (vector-ref (contents) 1)))))))
             ((equal? type "Link")
              `(a (@ (href ,(join-adjacent-strings
                             (vector->list (vector-ref (contents) 2)))))
